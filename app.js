@@ -1,16 +1,16 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require('dotenv').config();
+require('./config/db');
 
-var indexRouter = require('./routes/index');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var app = express();
+const indexRouter = require('./routes/index');
+const booksRouter = require('./routes/book');
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -18,23 +18,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// http://localhost:3000/books
+// Routes middleware entrypoint
 app.use('/', indexRouter);
+app.use('/books', booksRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+app.use((err, req, res, next) => {
   const errorMessages = {
     404: 'Page not found',
   };
 
-  // render the error page
-  res.status(err.status || 500).json(errorMessages[err.status])
+  res.status(err.status || 500).json(errorMessages[err.status] || err.message);
 });
 
 module.exports = app;
