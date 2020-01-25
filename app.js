@@ -9,6 +9,10 @@ const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
 const booksRouter = require('./routes/book');
+const songsRouter = require('./routes/songs');
+const authorsRouter = require('./routes/authors');
+
+const { headerKeyMiddleware } = require('./middlewares/header-key');
 
 const app = express();
 
@@ -20,7 +24,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes middleware entrypoint
 app.use('/', indexRouter);
-app.use('/books', booksRouter);
+app.use('/books', [headerKeyMiddleware], booksRouter);
+app.use('/songs', [headerKeyMiddleware], songsRouter);
+app.use('/authors', [headerKeyMiddleware], authorsRouter);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
